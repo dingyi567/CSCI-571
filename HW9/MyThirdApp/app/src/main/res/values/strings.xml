@@ -1,0 +1,21 @@
+
+<resources>
+<string name="app_name">MyThirdApp</string>
+
+<string name="ebay_search">eBay Search</string>
+<string name="action_settings">Settings</string>
+
+<string-array name="sortByArray">
+    <item>Best Match</item>
+    <item>Price: highest first</item>
+    <item>Price + Shipping: highest first</item>
+    <item>Price + Shipping: lowest first</item>
+</string-array>
+<string name="title_activity_display_item_list">DisplayItemListActivity</string>
+
+<string name="hello_world">Hello world!</string>
+    <string name="title_activity_details">DetailsActivity</string>
+    <string name="facebook_app_id">854251701314349</string>
+    <string name="no_result">{"ack":"No results found"}</string>
+
+</resources>

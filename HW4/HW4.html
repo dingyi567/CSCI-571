@@ -1,0 +1,135 @@
+<html>
+    <head>   
+    <title> hw4 </title>
+        <script type="text/javascript">
+            function viewXML(what){               
+                var URL = what.URL.value;
+                if(URL == ""){
+                        alert("empty query");
+                        return;
+                }
+                function loadXML(url) {
+                    var xmlhttp=false;
+                   
+                    if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+                        try {
+                            xmlhttp = new XMLHttpRequest();
+                        } catch (e) {
+                            xmlhttp=false;
+                        }
+                    }
+                    if (!xmlhttp && window.createRequest) {
+                        try {
+                            xmlhttp = window.createRequest();
+                        } catch (e) {
+                            xmlhttp=false;
+                        }
+                    }                    
+                   xmlhttp.open("GET",url,false);
+                   xmlhttp.send();  
+                   if(xmlhttp.status== 404) {                 
+                        alert("404  The XML file does not exist");
+                        return(null);
+                    }
+                    xmlDoc=xmlhttp.responseXML;
+                    if(xmlDoc == undefined){
+                        alert("empty query");
+                        return;
+                    }
+                    return xmlDoc;
+                }
+                xmlDoc = loadXML(URL);
+                if(xmlDoc){
+                    if (window.ActiveXObject) //if IE, simply execute script (due to async prop).
+                    { 
+                        if (xmlDoc.parseError.errorCode != 0) {
+                            alert("Error in line " + xmlDoc.parseError.line + " position " + xmlDoc.parseError.linePos + "\nError Code: " + xmlDoc.parseError.errorCode + "\nError Reason: " + xmlDoc.parseError.reason + "Error Line: " + xmlDoc.parseError.srcText);
+                            return(null);
+                        }
+                        else {
+                            generateHTML(xmlDoc);
+                        }
+                    } 
+                     else{ //else if FF, execute script once XML object has loaded 
+                          if (xmlDoc.documentElement.nodeName=="parsererror")
+                          {
+                              alert(xmlDoc.documentElement.childNodes[0].nodeValue);
+                              return(null);
+                          }
+                         xmlDoc.onload=generateHTML(xmlDoc);
+                     }                                                
+                }
+            }
+            
+            function generateHTML(xmlDoc){
+                    ELEMENT_NODE = 1; // MS parser doesn't define Node.ELEMENT_NODE
+                    root=xmlDoc.DocumentElement;
+                    html_text ="<html><head><title>XML Parse Result</title></head><body>";
+                    html_text+="<table border='2'>";
+                    planes=xmlDoc.getElementsByTagName("Row");
+                    if(planes.length<=1){
+                        alert("The XML file contains no companies");
+                        return;
+                    }
+                    planeNodeList=planes.item(0).childNodes;
+                    html_text+="<tbody>";
+                    html_text+="<tr>";
+                    x=200; y=200;
+                  
+                    // output the headers
+                    for(i=0;i<planeNodeList.length;i++){
+                     if(planeNodeList.item(i).nodeType==ELEMENT_NODE){
+                         header=planeNodeList.item(i).childNodes[0].nodeValue;
+                         html_text+="<th>"+header+"</th>"; 
+                     } 
+                    }
+                    html_text+="</tr>";
+                    // output out the values
+                    for(i=1;i<planes.length;i++){ //do for all planes
+                        k=0;
+                        planeNodeList=planes.item(i).childNodes; //get properties of a plane
+                        html_text+="<tr>"; //start a new row of the output table                     
+                        for(j=0;j<planeNodeList.length;j++){  
+                            if(planeNodeList.item(j).nodeType==ELEMENT_NODE){  
+                    
+                                //if(planeNodeList.item(j).firstChild){
+                                if(planeNodeList.item(j).firstChild!=undefined &&planeNodeList.item(j).firstChild.nodeValue.split(" ").length-1<planeNodeList.item(j).firstChild.nodeValue.length ){
+                                        if(k==6){
+                                        //handle images separately
+                                            html_text+="<td><img src='"+planeNodeList.item(j).firstChild.nodeValue+"' width='"+x+"'height='"+y+"'</td>";
+                                        }
+                                        else if(k==5){
+                                            html_text+="<td><a href='"+planeNodeList.item(j).firstChild.nodeValue +"'target='_blank'>link to company</a></td>";
+                                        }
+                                        else {
+                                            html_text+="<td>"+planeNodeList.item(j).firstChild.nodeValue+"</td>";
+                                        } 
+                                        
+                            }
+                                else html_text+="<td>N.A.</td>";
+                                k++;
+                            }        
+                        }
+                        html_text+="</tr>"; 
+                    }
+                    html_text+="</tbody>"; 
+                    html_text+="</table>";
+                    html_text+="</bo"+"dy></html>"; 
+                    hWin = window.open("", "Assignment4", "scrollbars=yes");
+                    hWin.document.write(html_text);
+                    hWin.document.close();
+              }                   
+            </script>   
+      </head>
+    
+      <body>
+            Enter URL for Company List XML File
+            <br />
+            <form name="myform" method="GET" id="location">
+            <input type="text" name="URL" maxlength="255" size="100" value="" />
+            <br />
+            <input type="button" name="submit" value="Submit Query" onClick="viewXML(this.form)" />
+            </form>
+           <noscript>
+    </body>                           
+ </html>
